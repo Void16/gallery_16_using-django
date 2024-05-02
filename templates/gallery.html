@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+      body {
+            background-color: #141d26; /* Twitter black */
+            color: #6b5b95; /* Dark purple text color */
+        }
+
+        /* Apply light purple background to text areas */
+        textarea {
+            background-color: #d3d0d6; /* Light purple background color for text areas */
+            color: black; /* Black text color */
+        }
+    #gallery-title {
+            text-align: center; /* Align text content at the center */
+            margin: 0;
+        }
+    .container {
+            display: grid;
+            grid-template-columns: 1fr 4fr; /* Divides the page into sections with a 1:2 ratio */
+            gap: 20px; /* Optional: Adds spacing between sections */
+        }
+        .section {
+            border: 1px;
+            padding: 20px;
+        }
+    .gallery-container {
+        display: flex;
+        justify-content: space-between; /* Adjust this property as needed */
+        /*align-items: center;  Optional: Align images vertically */
+        flex-wrap: wrap; /*Allow images to wrap to the next line if necessary */
+    }
+    .photo-container img {
+        max-width: 45%; /* Adjust the width of each image */
+        margin-bottom: 10px; /* Optional: Add margin between images */
+    }
+    .small-img img {
+    width: 20px;
+    height: 20px;
+    }
+    #comment {
+            width: 50%; /* Set the width to 100% of its container */
+            height: 100px; /* Set the initial height */
+            padding: 10px; /* Add padding for better readability */
+            border: 1px solid #ccc; /* Add a border */
+            border-radius: 5px; /* Add rounded corners */
+            resize: vertical; /* Allow vertical resizing */
+            font-family: Arial, sans-serif; /* Specify font family */
+            font-size: 16px; /* Specify font size */
+            line-height: 1.5; /* Specify line height */
+        }
+
+        /* Style the textarea when it's focused */
+        #comment:focus {
+            outline: none; /* Remove default focus outline */
+            border-color: dodgerblue; /* Change border color */
+            box-shadow: 0 0 5px dodgerblue; /* Add a subtle box shadow */
+        }
+        .comment-text {
+        color: dodgerblue;
+        }
+        
+
+        #gallery-title {
+    font-family: 'Jacquard 12 Charted', cursive; /* Use the Jacquard 12 Charted font from Google Fonts */
+    font-size: 48px; /* Adjust font size as needed */
+    color: darkorchid; /* Specify text color */
+    /* Add any additional styling here */
+}
+
+.glitch{
+    text-align: center;
+    margin: 0;
+}
+
+
+</style>
+
+
+  <h1 id="gallery-title">Gallery_16</h1>
+  <p class="glitch">rate it, comment it, to your heart's content</p>
+  <hr>
+  <div class="container">
+    <div class="section">
+  <aside class="sidebar">
+    <h2>Ranking </h2>
+    <br>
+      {% for photo in top_photos %}
+      <a href="{{ MEDIA_URL }}{{ photo.image.url }}" class="small-img">
+        <img src="{{ MEDIA_URL }}{{ photo.image.url }}" alt="Photo {{ photo.pk }}">
+    </a>
+    
+            - {{ photo.likes }} star ranking </href=></li>
+            <br>
+            <br>
+      {% empty %}
+        No photos yet.
+      {% endfor %}
+    
+  </aside>
+</div>
+<div class="section">
+  <div class="gallery-container">
+    {% for photo in photos %}
+      <div class="photo-container">
+        <a href="{{ MEDIA_URL }}{{ photo.image.url }}">
+        <img src="{{ MEDIA_URL }}{{ photo.image.url }}" alt="Photo {{ photo.pk }}" width="400" height="200"> </a>
+        <div class="rating-container">
+          {% for rating in photo.rating_set.all %}
+            <span class="star">★</span>
+          {% empty %}
+            <span class="star">☆</span>
+          {% endfor %}
+        </div>
+        <div class="comment-container">
+            <p class="comment-text">{{ photo.comment_set.first.comment }}</p>
+             {% if photo.comment_set.count > 1 %}
+        <button id="show-comments-btn">Show all comments</button>
+        <div id="hidden-comments" style="display: none;">
+            {% for comment in photo.comment_set.all|slice:"1:" %}
+                <p class="comment-text">@ {{ comment.comment }}</p>
+            {% endfor %}
+        </div>
+         {% endif %}
+          <br>
+        </div>
+        <div>
+        <form method="post" action="{% url 'gallery' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div>
+                <input type="hidden" name="photo_id" value="{{ photo.pk }}">
+            </div>.
+            <br>
+            <div>
+                <label for="rating">Rate this photo:</label>
+                <input type="number" id="rating" name="rating" min="1" max="5" value="1">
+                <button type="submit" name="add_rating">Rate</button>
+            </div>
+            <br>
+            <div>
+                <label for="comment">Add a comment:</label><br>
+                <textarea id="comment" name="comment"></textarea><br><br>
+                <button type="submit" name="add_comment">Comment</button>
+                <hr>
+                <br>
+            </div>
+        </form>
+    </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const showCommentsButton = document.getElementById("show-comments-btn");
+    const hiddenComments = document.getElementById("hidden-comments");
+
+    showCommentsButton.addEventListener("click", function() {
+        hiddenComments.style.display = "block";
+        showCommentsButton.style.display = "none";
+    });
+});
+
+</script>
+{% endblock %}
