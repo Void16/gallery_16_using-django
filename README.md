@@ -1,0 +1,1 @@
+this project enbles people to rate products that the admin posts, they can put a rating on the product and also comment on the product.... this project is yet to have and authentication and also be added extra functionality  
